@@ -44,8 +44,8 @@ Enjoy the convenience of managing student data and generating statistical report
 
 Screenshots
 ![App Screenshot 1](https://i.ibb.co/1zNBBr6/1.png)
-![App Screenshot 2](https://ibb.co/tLNrdYB/2.png)
-![App Screenshot 3](https://ibb.co/5xpzrpP/3.png)
+![App Screenshot 2](https://i.ibb.co/5KzH7sT/2.png)
+![App Screenshot 3](https://i.ibb.co/Wp8dk8L/3.png)
 
 License
 This project is licensed under the itsjusthisham Licence
