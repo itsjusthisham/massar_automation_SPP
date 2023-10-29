@@ -14,7 +14,8 @@ To use this app, follow these steps:
 2. Navigate to the project directory:
    
    ```bash
-   cd your-repo
+   cd massar_automation_SPP
+   
 3. Install Node.js dependencies:
    
     ```bash
