@@ -9,7 +9,7 @@ To use this app, follow these steps:
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/yourusername/your-repo.git
+   git clone https://github.com/itsjusthisham/massar_automation_SPP
 
 2. Navigate to the project directory:
    
