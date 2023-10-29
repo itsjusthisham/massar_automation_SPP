@@ -33,7 +33,7 @@ To use this app, follow these steps:
 Start the app:
 
     ```bash
-       npm start
+    npm start
     
 5. Ensure that you have the necessary libraries installed.
 
