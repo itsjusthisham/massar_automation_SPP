@@ -51,9 +51,4 @@ Screenshots
 License
 This project is licensed under the itsjusthisham Licence
 
-https://ezzamzami.com
-"""
-
-# Write the README content to a file
-with open('README.md', 'w') as readme_file:
-    readme_file.write(readme_content)
+# https://ezzamzami.com
