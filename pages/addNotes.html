@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <title>Document</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body{
+            width: 1000px;
+            height: 600px;
+        }
+        #main{
+            width: 100%;
+            height: 100%;
+        }
+        .container{
+            padding-right: 1.75rem;
+            padding-left: 1.75rem;
+            margin-right: auto;
+            margin-left: auto;
+        }
+        h2{
+            padding: 30px 0 15px;
+            text-align: center;
+        }
+        table {
+            width: 100%;
+        }
+        table, td,th {
+            border-collapse: collapse;
+            border: 1px solid #333;
+        }
+        thead {
+            display: table; /* to take the same width as tr */
+            width: calc(100% - 17px); /* - 17px because of the scrollbar width */
+        }
+        tbody {
+            display: block; /* to enable vertical scrolling */
+            max-height: 256px; /* e.g. */
+            overflow-y: scroll; /* keeps the scrollbar even if it doesn't need it; display purpose */
+        }
+        th, td {
+            width: 16.67%; /* to enable "word-break: break-all" */
+            padding: 5px;
+            word-break: break-all; /* 4. */
+            text-align: left;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 12px;
+        }
+        tr {
+            display: table; /* display purpose; th's border */
+            width: 100%;
+            box-sizing: border-box; /* because of the border (Chrome needs this line, but not FF) */
+        }
+        
+        /* width */
+        ::-webkit-scrollbar {
+        width: 17px;
+        }
+        /* Track */
+        ::-webkit-scrollbar-track {
+        box-shadow: inset 0 0 5px grey; 
+        border-radius: 10px;
+        }
+        /* Handle */
+        ::-webkit-scrollbar-thumb {
+        background: #484848; 
+        border-radius: 10px;
+        }
+        /* Handle on hover */
+        ::-webkit-scrollbar-thumb:hover {
+        background: #2c2c2c; 
+        }
+        .control_button{
+            width: 80px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            position: relative;
+            left: 920px;
+            text-align: center;
+            flex-direction: row-reverse;
+        }
+        .control_button span{
+            width: 100%;
+            height: 100%;
+            padding: 8px 0;
+        }
+        .control_button span:nth-child(1){
+            background-color: red;
+            cursor: pointer;
+        }
+        .control_button span:nth-child(2){
+            background-color: whitesmoke;
+            cursor: pointer;
+            border-radius: 0 0 0 5px;
+        }
+        .control_button span:nth-child(1):hover{
+            background-color: tomato;
+        }
+        .control_button span:nth-child(2):hover{
+            background-color: #ccc;
+        }
+        .buttons{
+            height: 140px;
+            display: flex;
+            align-items: center;
+        }
+        .buttons button{
+            font-size: 16px;
+            padding: 10px;
+            margin-right: 50px;
+            cursor: pointer;
+        }
+        .buttons button:nth-child(1){
+            background-color: #484848;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        .buttons button:nth-child(2){
+            background-color: #ccc;
+            color: #484848;
+            border: 1px solid #484848;
+            border-radius: 5px;
+        }
+        .container img{
+            width: 100px;
+            height: 100px;
+            display: inline-flex;
+            position: absolute;
+            left: 880px;
+            bottom: 70px;
+        }
+        .form-control {
+          padding: 0!important;
+        }
+    </style>
+</head>
+<body>
+    <div id="main">
+        <div class="control_button">
+            <span id="close-btn">✕</span>
+            <span id="minimize-btn">—</span>
+        </div>
+        <div class="container">
+            <h2>Etudiants</h2>
+            <table> 
+                <thead> 
+                  <tr>
+                    <th>Code Massar</th>
+                    <th>Le nom complet</th>
+                    <th>Évaluation n°1</th>
+                    <th>Évaluation n°2</th>
+                    <th>Évaluation n°3</th>
+                    <th>La moyenne</th>
+                  </tr> 
+                </thead>
+                <tbody id="etudiants_notes">
+                 
+                </tbody>
+              </table>
+              <div class="buttons">
+                <button id="rapport_controle">Rapport d'évaluation</button>
+                <button id="charger_notes">Charger les points sur Massar ▶︎</button>
+                <button id="backTomenu" style="background-color: #b32525;">Retour</button>
+              </div>
+              <img src="img.png" alt="logo">
+        </div>
+    </div>
+    <script src="../renderer.js"></script>
+    <script>
+      
+      // Extract the students data from the query parameter in the URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const studentsDataParam = urlParams.get('students');
+      const studentsData = JSON.parse(decodeURIComponent(studentsDataParam));
+      const loginInfo = JSON.parse(urlParams.get('loginInfo'));
+
+      // Use the students data as needed
+      const filteredData = studentsData.filter(item => {
+        // Check if any value in the object is null
+        for (const key in item) {
+          if (item[key] === null && (!key.startsWith('controle') && !key.startsWith('col'))) {
+            return false; // Exclude the object from the filtered data
+          }
+        }
+        return true; // Include the object in the filtered data
+      });
+
+      const tbody = document.querySelector('#etudiants_notes');
+
+      filteredData.forEach(item => {
+        const row = document.createElement('tr');
+
+        for (const key in item) {
+          
+          if(key.startsWith('col')){
+              continue
+          }
+
+          if (Object.hasOwnProperty.call(item, key)) {
+
+            const cell = document.createElement('td');
+
+            if (key.startsWith('controle')) {
+
+              if(key === 'controle1') {
+                cell.setAttribute('data-cell', item["col1"]);
+              }else if(key === 'controle2') {
+                cell.setAttribute('data-cell', item["col2"]);
+              } else if(key === 'controle3') { 
+                cell.setAttribute('data-cell', item["col3"]);
+              }
+
+              cell.textContent = item[key];
+
+            } else {
+
+              cell.textContent = item[key];
+
+            }
+
+            row.appendChild(cell);
+          }
+        }
+        const moyennecell = document.createElement('td');
+        row.appendChild(moyennecell);
+
+        tbody.appendChild(row);
+      });
+
+      const classe = urlParams.get('classe');
+      const table = document.querySelector('#etudiants_notes');
+      const cells = table.getElementsByTagName('td');
+
+      // Function to move to the next cell or next row
+      const moveToNextCell = (currentCell) => {
+        const currentRowIndex = currentCell.parentNode.rowIndex;
+        const currentCellIndex = currentCell.cellIndex;
+
+        // Calculate the index of the next cell or next row
+        let nextRowIndex = currentRowIndex;
+        let nextCellIndex = currentCellIndex + 1;
+
+        if (nextCellIndex >= cells.length) {
+          // Move to the next row
+          nextRowIndex += 1;
+          nextCellIndex = 0;
+        }
+
+        // Check if the next row exists
+        if (nextRowIndex < table.rows.length) {
+          // Move to the next cell or next row
+          const nextRow = table.rows[nextRowIndex];
+          const nextCell = nextRow.cells[nextCellIndex-1];
+          nextCell.click();
+        }
+      };
+
+      // Add a click event listener to the table
+      table.addEventListener('click', (event) => {
+        const target = event.target;
+
+        // Check if the clicked element is a <td> element
+        if (target.tagName === 'TD') {
+          // Get the text content of the clicked <td> element
+          const text = target.textContent.trim();
+
+          // Create an <input> element
+          const input = document.createElement('input');
+          input.type = 'text';
+          input.value = text;
+          input.classList.add("form-control");
+
+          // Replace the text content of the <td> element with the <input> element
+          target.innerHTML = '';
+          target.appendChild(input);
+
+          // Focus the input element
+          setTimeout(() => {
+            input.focus();
+            input.select();
+          }, 100);
+          // Handle input changes
+          input.addEventListener('blur', () => {
+            // Get the updated value from the input element
+            const updatedValue = input.value;
+
+            // Replace the <input> element with the updated value
+            target.textContent = updatedValue;
+          });
+
+          // Handle Enter key press
+          input.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+              event.preventDefault();
+              const inputValue = input.value;
+              const column = target.getAttribute('data-cell');
+              // Send a message to the main process to execute the Python function
+              ipcRenderer.send('execute-python-function', inputValue, column, classe);
+              target.textContent = inputValue;
+
+              // Move to the next cell or next row
+              moveToNextCell(target);
+            }
+          });
+        }
+      });
+
+
+      ipcRenderer.on('send-note', (event, response) => {
+            
+            if (response.success) {
+                console.log("Done")
+            } else {
+                // Display error notification
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Une erreur s\'est produite lors de l\'exécution de la fonction Python.',
+                    footer: 'Veuillez réessayer.',
+                });
+            }
+      });
+
+      const rapportControle = document.querySelector('#rapport_controle')
+
+      rapportControle.addEventListener('click', (event) => {
+        Swal.fire({
+          title: 'Select an option',
+          html: `
+            <select id="controle-number" class="form-control">
+              <option value="numero">Controle Numero?</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+            </select>
+          `,
+          showCancelButton: true,
+          confirmButtonText: 'OK',
+        }).then((result) => {
+          if (result.isConfirmed) {
+            // Get the selected value from the select box
+            const controleNumber = document.querySelector('#controle-number').value;
+            console.log(controleNumber);
+            ipcRenderer.send('generate-rapport', controleNumber, classe);
+          }
+        });
+      })
+
+      ipcRenderer.on('send-rapport', (event, response) => {
+            
+            if (response.success) {
+                console.log("Done")
+            } else {
+                // Display error notification
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Une erreur s\'est produite lors de l\'exécution de la fonction Python.',
+                    footer: 'Veuillez réessayer.',
+                });
+            }
+      });
+
+      const chargerNotesBtn = document.querySelector("#charger_notes")
+      chargerNotesBtn.addEventListener("click", (event) => {
+        console.log(loginInfo)
+
+        ipcRenderer.send('charger-notes', classe, loginInfo.session, JSON.stringify(loginInfo));
+      })
+
+      ipcRenderer.on('notes-added', (event, response) => {
+            
+            if (response.success) {
+              Swal.fire({
+                title: "Success",
+                text: "Les notes sont chargées avec succès!",
+                icon: "success",
+                confirmButtonText: "OK"
+              }).then(() => {
+                // Perform any additional actions after the user clicks "OK"
+                // For example, you can redirect to another page or reload the current page
+              });
+            } else {
+                // Display error notification
+                console.log("Error")
+            }
+      });
+
+      document.querySelector("#backTomenu").addEventListener("click", () => {
+        
+        const pagePath = path.join(__dirname, 'chooseClasse.html');
+
+        const url = `file://${pagePath}?loginInfo=${JSON.stringify(loginInfo)}`;
+        window.location.href = url;
+      })
+
+    </script>
+</body>
+</html>

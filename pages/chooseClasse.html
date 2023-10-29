@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <title>Document</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body{
+            width: 1000px;
+            height: 600px;
+        }
+        #main{
+            width: 100%;
+            height: 100%;
+        }
+        .container{
+            padding-right: 1.75rem;
+            padding-left: 1.75rem;
+            margin-right: auto;
+            margin-left: auto;
+        }
+        h3{
+            font-size: x-large;
+            text-align: left;
+            padding: 30px 0 20px;
+        }
+        .row{
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .col{
+            flex: 1 0 0%;
+        }
+        .col div{
+            display: grid;
+            margin: 20px;
+        }
+        .col div select{
+            font-size: 16px;
+            font-weight: 400;
+            height: 40px;
+            padding: 6px 8px;
+        }
+        
+        .control_button{
+            width: 80px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            position: relative;
+            left: 920px;
+            text-align: center;
+            flex-direction: row-reverse;
+        }
+        .control_button span{
+            width: 100%;
+            height: 100%;
+            padding: 8px 0;
+        }
+        .control_button span:nth-child(1){
+            background-color: red;
+            cursor: pointer;
+        }
+        .control_button span:nth-child(2){
+            background-color: whitesmoke;
+            cursor: pointer;
+            border-radius: 0 0 0 5px;
+        }
+        .control_button span:nth-child(1):hover{
+            background-color: tomato;
+        }
+        .control_button span:nth-child(2):hover{
+            background-color: #ccc;
+        }
+        .buttons{
+            height: 140px;
+            display: flex;
+            align-items: center;
+        }
+        .buttons button{
+            font-size: 16px;
+            padding: 10px;
+            margin-right: 50px;
+            cursor: pointer;
+        }
+        .buttons button:nth-child(1){
+            background-color: #484848;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        .buttons button:nth-child(2){
+            background-color: #ccc;
+            color: #484848;
+            border: 1px solid #484848;
+            border-radius: 5px;
+        }
+        .container img{
+            width: 100px;
+            height: 100px;
+            display: inline-flex;
+            position: absolute;
+            left: 880px;
+            bottom: 70px;
+        }
+    </style>
+</head>
+<body>
+    <div id="main">
+        <div class="control_button">
+            <span id="close-btn">✕</span>
+            <span id="minimize-btn">—</span>
+        </div>
+        <div class="container">
+            <div id="drag_place"></div>
+            <h3>Bonjour professeur</h3>
+            <div class="row">
+                <div class="col">
+                    <div>
+                        <label for="niveau">Le niveau</label>
+                        <select name="le niveau" id="niveau"></select>
+                    </div>
+                    <div>
+                        <label for="etudiant">L'étudiant(e)</label>
+                        <select name="étudiant" id="etudiant"></select>
+                    </div>
+                </div>
+            </div>
+            <div class="buttons">
+                <button id="addnotes">Liste des étudiants du département ▶︎</button>
+                <button>Profil étudiant</button>
+            </div>
+            <img src="img.png" alt="logo">
+        </div>
+    </div>
+
+    <script src="../renderer.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+          // Send a request to the main process to get the additional data
+          ipcRenderer.send('get-additional-data');
+        });
+      
+        // Receive additional data from the main process
+        ipcRenderer.on('additional-data', (event, classes) => {
+          // Handle the received additional data
+          console.log(classes);
+          htmlOutput = '<option>Choisir Une Classe</option>';
+          classes.forEach((classe) => {
+            htmlOutput += '<option value="' + classe + '">' + classe + '</option>'
+          })
+          document.getElementById("niveau").innerHTML = htmlOutput
+          // Use the additional data to pre-fill the form fields or perform any other actions
+        });
+
+        // Select boxes
+        const selectBox1 = document.getElementById('niveau');
+        const selectBox2 = document.getElementById('etudiant');
+
+        // Listen for change event on select box 1
+        selectBox1.addEventListener('change', () => {
+        // Get the selected value
+        const selectedValue = selectBox1.value;
+
+        // Send the selected value to the main process to run the Python code
+        ipcRenderer.send('run-python-code', selectedValue);
+        });
+
+        // Receive the data from the Python code
+        ipcRenderer.on('python-data', (event, data) => {
+            // Update select box 2 with the received data
+            updateSelectBox2(data);
+        });
+
+        // Function to update select box 2 with the received data
+        function updateSelectBox2(data) {
+            // Clear select box 2
+            selectBox2.innerHTML = '<option value="tous">Toutes La classe</option>';
+            const cleanedArray = data.filter(item => item !== null);
+
+            // Add options to select box 2 based on the received data
+            cleanedArray.forEach((item) => {
+                const option = document.createElement('option');
+                option.text = item;
+                selectBox2.add(option);
+            });
+        }
+
+        const addnotes = document.querySelector('#addnotes');
+
+        // Handle form submission
+        addnotes.addEventListener('click', (event) => {
+
+            // Get the selected value
+            const classe = document.querySelector('#niveau').value;
+            const selectedValue2 = document.querySelector('#etudiant').value;
+            console.log(selectedValue2)
+            // Send the selected value to the main process
+            if(selectedValue2 === 'tous'){
+                ipcRenderer.send('run-python-function', classe);
+            }
+            else {
+                // Display error notification
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Vous devez choisir toute la classe!',
+                    footer: "Ressayer a nouveau",
+                });
+            }
+        });
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const loginInfo = urlParams.get('loginInfo');
+        ipcRenderer.on('python-function-response', (event, response) => {
+            // Handle the response from the Python function
+            console.log(response);
+            if (response.success) {
+                let students = response.data;
+
+                // Redirect to the other page and pass the data as a query parameter
+                const pagePath = path.join(__dirname, 'addNotes.html');
+                const url = `file://${pagePath}?students=${encodeURIComponent(students)}&classe=${selectBox1.value}&loginInfo=${loginInfo}`;
+                window.location.href = url;
+            } else {
+                // Display error notification
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Une erreur s\'est produite lors de l\'exécution de la fonction Python.',
+                    footer: 'Veuillez réessayer.',
+                });
+            }
+        });
+      </script>
+</body>
+</html>
