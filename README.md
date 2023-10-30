@@ -1,4 +1,4 @@
-# Statistical Tool for Teachers v1
+# Statistical Tool for Teachers v1.0.0
 
 Statistical Tool for Teachers is an automation tool that simplifies the process of exporting and importing student data from Massar. Teachers can easily add student exam notes, and the program will handle the rest. Additionally, the app can generate reports for each exam with statistical graphs.
 
