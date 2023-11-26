@@ -1,4 +1,4 @@
-# Statistical Tool for Teachers
+# Statistical Tool for Teachers v1.0.0
 
 Statistical Tool for Teachers is an automation tool that simplifies the process of exporting and importing student data from Massar. Teachers can easily add student exam notes, and the program will handle the rest. Additionally, the app can generate reports for each exam with statistical graphs.
 
@@ -9,12 +9,13 @@ To use this app, follow these steps:
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/yourusername/your-repo.git
+   git clone https://github.com/itsjusthisham/massar_automation_SPP
 
 2. Navigate to the project directory:
    
    ```bash
-   cd your-repo
+   cd massar_automation_SPP
+   
 3. Install Node.js dependencies:
    
     ```bash
@@ -32,7 +33,7 @@ To use this app, follow these steps:
 Start the app:
 
     ```bash
-       npm start
+    npm start
     
 5. Ensure that you have the necessary libraries installed.
 
@@ -50,9 +51,4 @@ Screenshots
 License
 This project is licensed under the itsjusthisham Licence
 
-https://ezzamzami.com
-"""
-
-# Write the README content to a file
-with open('README.md', 'w') as readme_file:
-    readme_file.write(readme_content)
+# https://ezzamzami.com
